@@ -216,3 +216,10 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Database (downloaded at runtime)
+*.db
+
+# Project docs and Claude config
+docs/
+.claude/
