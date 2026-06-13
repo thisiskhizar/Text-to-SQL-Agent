@@ -40,6 +40,32 @@ def build_agent(llm: ChatOpenAI, tools: list, db: SQLDatabase):
     return agent
 
 
+def build_chat_agent(llm: ChatOpenAI, tools: list, db: SQLDatabase):
+    """Create and return a ReAct SQL agent with memory for multi-turn chat.
+
+    Same as build_agent() but adds an InMemorySaver checkpointer so the
+    agent retains conversation history across turns within a session.
+
+    Args:
+        llm: The chat model that will reason and generate SQL queries.
+        tools: The list of SQL tools returned by get_tools().
+        db: The connected SQLDatabase instance, used to derive the dialect.
+
+    Returns:
+        A compiled LangGraph agent that maintains message history per thread.
+    """
+    system_prompt = build_system_prompt(dialect=db.dialect)
+
+    agent = create_agent(
+        llm,
+        tools,
+        system_prompt=system_prompt,
+        checkpointer=InMemorySaver(),
+    )
+
+    return agent
+
+
 def build_hitl_agent(llm: ChatOpenAI, tools: list, db: SQLDatabase):
     """Create and return a ReAct SQL agent with human-in-the-loop review.
 
